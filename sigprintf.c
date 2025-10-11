@@ -255,7 +255,8 @@ sigvdprintf(int fd, const char *format, va_list ap)
 
 	if (format == NULL) return -1;
 
-	format_to_buffer(s, format, ap);
+	if (format_to_buffer(s, format, ap) < 0) return -1;
+
 	c = write(fd, s, sigstrlen(s));
 	if (c == -1) return -1;
 
