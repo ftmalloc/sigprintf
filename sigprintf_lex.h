@@ -9,7 +9,6 @@ fmt_type
 	UINT,
 	LONG,
 	ULONG,
-	CHAR,
 	STRING,
 	PERCENT
 };
