@@ -17,8 +17,20 @@ struct
 fmt_tok
 {
 	enum fmt_type type;
-	void *data;
-	long end; /* only used for literals */
+	union
+	{
+		struct
+		{
+			char *str;
+			size_t len;
+		} lit;
+		int d;
+		unsigned int u;
+		long l;
+		unsigned long ul;
+		char *s;
+
+	} data;
 };
 
 #endif /* SIGPRINTF_SIGPRINTF_LEX_H */
