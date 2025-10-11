@@ -42,6 +42,12 @@ sigultoa(char *b, unsigned long u)
 	char temp;
 
 	(void)memset(b, 0, LTOA_BUFF_LEN);
+	if (u == 0)
+	{
+		b[0] = '0';
+
+		return;
+	}
 	while (u > 0)
 	{
 		b[d++] = (char)(u % 10 + '0');
