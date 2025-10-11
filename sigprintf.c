@@ -105,6 +105,8 @@ format_to_buffer(char *b, const char *format, va_list ap)
 			tok_list[tok_c].end = end;
 			tok_c++;
 		}
+		if (ch - format >= SIGPRINTF_FORMAT_LEN) return -1;
+
 		f = *(ch + 1);
 		switch (f)
 		{
