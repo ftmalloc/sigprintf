@@ -119,12 +119,12 @@ format_to_buffer(char *b, const char *format, va_list ap)
 				if (*(ch + 2) == 'u')
 				{
 					tok_list[tok_c].type = ULONG;
-					tok_list[tok_c].data.l = va_arg(ap, long);
+					tok_list[tok_c].data.l = va_arg(ap, unsigned long);
 				}
 				else if (*(ch + 2) == 'd')
 				{
 					tok_list[tok_c].type = LONG;
-					tok_list[tok_c].data.ul = va_arg(ap, unsigned long);
+					tok_list[tok_c].data.ul = va_arg(ap, long);
 				}
 				else
 				{
