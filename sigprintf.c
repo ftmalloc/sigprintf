@@ -84,7 +84,7 @@ format_to_buffer(char *b, const char *format, va_list ap)
 		if (tok_list[tok_c].type != PERCENT)
 			tok_list[tok_c].data = va_arg(ap, void *);
 		tok_c++;
-		if (tok_c <= TOK_LIST_LEN) return -1;
+		if (tok_c >= TOK_LIST_LEN) return -1;
 	}
 	if (start < format + fmt_len)
 	{
@@ -92,7 +92,7 @@ format_to_buffer(char *b, const char *format, va_list ap)
 		tok_list[tok_c].data = start;
 		tok_list[tok_c].end = format + fmt_len - start;
 		tok_c++;
-		if (tok_c <= TOK_LIST_LEN) return -1;
+		if (tok_c >= TOK_LIST_LEN) return -1;
 	}
 	for (i = 0; i < tok_c; i++)
 	{
