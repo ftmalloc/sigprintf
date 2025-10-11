@@ -253,6 +253,8 @@ sigvdprintf(int fd, const char *format, va_list ap)
 	char s[SIGPRINTF_FORMAT_LEN];
 	ssize_t c;
 
+	if (format == NULL) return -1;
+
 	format_to_buffer(s, format, ap);
 	c = write(fd, s, sigstrlen(s));
 	if (c == -1) return -1;
