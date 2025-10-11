@@ -5,20 +5,68 @@
 #include "sigprintf.h"
 #include "sigprintf_lex.h"
 
-#define TOK_LIST_LEN 24
+#define MEMMOVE_BUFF_LEN 1024
 #define LTOA_BUFF_LEN 24
+#define TOK_LIST_LEN 24
 
-static void
-sigltoa(char *b, long d)
+static void *
+sigmemmove(void *dst, const void *src, size_t n)
 {
-	(void)memset(b, 0, LTOA_BUFF_LEN);
+	unsigned char b[MEMMOVE_BUFF_LEN];
+
+	if (n >= MEMMOVE_BUFF_LEN) return NULL;
+
+	(void)memcpy(b, src, n);
+	(void)memcpy(dst, b, n);
+
+	return dst;
 }
 
 static void
 sigultoa(char *b, unsigned long u)
 {
-	(void)memset(b, 0, LTOA_BUFF_LEN);
+	int d = 0;
+	int i;
+	size_t b_len;
+	char temp;
 
+	(void)memset(b, 0, LTOA_BUFF_LEN);
+	while (u > 0)
+	{
+		b[d++] = (char)(u % 10 + '0');
+		u /= 10;
+	}
+	b_len = strlen(b);
+	for (i = 0; i < b_len >> 1; i++)
+	{
+		temp = b[i];
+		b[i] = b[b_len - 1 - i];
+		b[b_len - 1 - i] = temp;
+	}
+}
+
+static void
+sigltoa(char *b, long d)
+{
+	long dabs;
+	int neg;
+
+	if (d < 0)
+	{
+		dabs = -d;
+		neg = 1;
+	}
+	else
+	{
+		dabs = d;
+		neg = 0;
+	}
+	sigultoa(b, dabs);
+	if (neg)
+	{
+		(void)sigmemmove(&b[1], b, strlen(b) + 1);
+		b[0] = '-';
+	}
 }
 
 static int
@@ -105,6 +153,12 @@ format_to_buffer(char *b, const char *format, va_list ap)
 				c += tok_list[i].end;
 				break;
 			case INT:
+				sigltoa(ltoa_buff, (int)tok_list[i].data);
+				if (c + strlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
+
+				(void)strncpy(b + c, ltoa_buff, strlen(ltoa_buff));
+				c += strlen(ltoa_buff);
+				break;
 			case LONG:
 				sigltoa(ltoa_buff, (long)tok_list[i].data);
 				if (c + strlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
@@ -113,8 +167,13 @@ format_to_buffer(char *b, const char *format, va_list ap)
 				c += strlen(ltoa_buff);
 				break;
 			case UINT:
+				sigultoa(ltoa_buff, (unsigned int)tok_list[i].data);
+				if (c + strlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
+
+				(void)strncpy(b + c, ltoa_buff, strlen(ltoa_buff));
+				c += strlen(ltoa_buff);
 			case ULONG:
-				sigultoa(ltoa_buff, (long)tok_list[i].data);
+				sigultoa(ltoa_buff, (unsigned long)tok_list[i].data);
 				if (c + strlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
 
 				(void)strncpy(b + c, ltoa_buff, strlen(ltoa_buff));
