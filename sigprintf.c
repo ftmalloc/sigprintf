@@ -118,10 +118,14 @@ format_to_buffer(char *b, const char *format, va_list ap)
 					tok_list[tok_c].type = ULONG;
 					start = ch + 3;
 				}
-				else
+				else if (*(ch + 2) == 'd')
 				{
 					tok_list[tok_c].type = LONG;
-					start = ch + 2;
+					start = ch + 3;
+				}
+				else
+				{
+					return -1;
 				}
 				break;
 			case 'u':
