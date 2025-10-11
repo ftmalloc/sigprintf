@@ -172,6 +172,7 @@ format_to_buffer(char *b, const char *format, va_list ap)
 
 				(void)strncpy(b + c, ltoa_buff, strlen(ltoa_buff));
 				c += strlen(ltoa_buff);
+				break;
 			case ULONG:
 				sigultoa(ltoa_buff, (unsigned long)tok_list[i].data);
 				if (c + strlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
@@ -212,7 +213,7 @@ sigputs(const char *s)
 {
 	int c;
 
-	c = sigdputs(s, STDIN_FILENO);
+	c = sigdputs(s, STDOUT_FILENO);
 	if (c == -1) return -1;
 
 	if (write(1, "\n", 1) == -1) return c;
