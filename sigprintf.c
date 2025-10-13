@@ -1,6 +1,11 @@
+#include <limits.h>
+
 #include <unistd.h>
 
 #include "sigprintf.h"
+
+#include <string.h>
+
 #include "sigprintf_lex.h"
 #include "sigstring.h"
 
@@ -48,10 +53,20 @@ sigltoa(char *b, long d)
 {
 	long dabs;
 	int neg;
+	int min = 0;
+	size_t i;
 
 	if (d < 0)
 	{
-		dabs = -d;
+		if (d == LONG_MIN)
+		{
+			dabs = LONG_MAX;
+			min = 1;
+		}
+		else
+		{
+			dabs = -d;
+		}
 		neg = 1;
 	}
 	else
@@ -64,6 +79,14 @@ sigltoa(char *b, long d)
 	{
 		(void)sigmemmove(&b[1], b, sigstrlen(b) + 1);
 		b[0] = '-';
+		if (min)
+			for (i = strlen(b) - 1; i > 0; i--)
+			{
+				if (++b[i] == '9' + 1)
+					b[i] = '0';
+				else
+					break;
+			}
 	}
 }
 
