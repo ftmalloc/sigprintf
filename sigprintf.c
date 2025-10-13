@@ -3,9 +3,6 @@
 #include <unistd.h>
 
 #include "sigprintf.h"
-
-#include <string.h>
-
 #include "sigprintf_lex.h"
 #include "sigstring.h"
 
@@ -80,7 +77,7 @@ sigltoa(char *b, long d)
 		(void)sigmemmove(&b[1], b, sigstrlen(b) + 1);
 		b[0] = '-';
 		if (min)
-			for (i = strlen(b) - 1; i > 0; i--)
+			for (i = sigstrlen(b) - 1; i > 0; i--)
 			{
 				if (++b[i] == '9' + 1)
 					b[i] = '0';
