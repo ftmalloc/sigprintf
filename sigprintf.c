@@ -4,8 +4,8 @@
 #include "sigprintf_lex.h"
 #include "sigstring.h"
 
-#define LTOA_BUFF_LEN 24
-#define TOK_LIST_LEN 24
+#define LTOA_BUFF_LEN 21 /* Max digits of an unsigned 64-bit integer */
+#define SIGPRINTF_MAX_TOKENS 24
 
 static void
 sigultoa(char *b, unsigned long u)
@@ -63,7 +63,7 @@ sigltoa(char *b, long d)
 static int
 format_to_buffer(char *b, const char *format, va_list ap)
 {
-	struct fmt_tok tok_list[TOK_LIST_LEN];
+	struct fmt_tok tok_list[SIGPRINTF_MAX_TOKENS];
 	int tok_c = 0;
 	int i;
 	char *start = (char *)format;
@@ -130,7 +130,7 @@ format_to_buffer(char *b, const char *format, va_list ap)
 				return -1;
 		}
 		tok_c++;
-		if (tok_c >= TOK_LIST_LEN) return -1;
+		if (tok_c >= SIGPRINTF_MAX_TOKENS) return -1;
 	}
 	if (start < format + fmt_len)
 	{
@@ -138,7 +138,7 @@ format_to_buffer(char *b, const char *format, va_list ap)
 		tok_list[tok_c].data.lit.str = start;
 		tok_list[tok_c].data.lit.len = format + fmt_len - start;
 		tok_c++;
-		if (tok_c >= TOK_LIST_LEN) return -1;
+		if (tok_c >= SIGPRINTF_MAX_TOKENS) return -1;
 	}
 	for (i = 0; i < tok_c; i++)
 	{
