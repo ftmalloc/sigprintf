@@ -3,8 +3,6 @@
 
 #include <stddef.h>
 
-#define MEMMOVE_BUFF_LEN 1024
-
 size_t sigstrlen(const char *s);
 char *sigstrncpy(char *dst, const char *src, size_t len);
 char *sigstrchr(const char *s, int c);
