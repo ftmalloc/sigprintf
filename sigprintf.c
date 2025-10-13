@@ -7,6 +7,13 @@
 #define LTOA_BUFF_LEN 21 /* Max digits of an unsigned 64-bit integer */
 #define SIGPRINTF_MAX_TOKENS 24
 
+union
+ptr_bytes
+{
+	void *p;
+	unsigned char b[sizeof(void *)];
+};
+
 static void
 sigultoa(char *b, unsigned long u)
 {
@@ -58,6 +65,39 @@ sigltoa(char *b, long d)
 		(void)sigmemmove(&b[1], b, sigstrlen(b) + 1);
 		b[0] = '-';
 	}
+}
+
+static void
+sigptoa(char *b, void *p)
+{
+	const char charset[] = {
+		'0', '1', '2', '3',
+		'4', '5', '6', '7',
+		'8', '9', 'a', 'b',
+		'c', 'd', 'e', 'f'
+	};
+	union ptr_bytes pbytes;
+	ssize_t plen = sizeof(void *);
+	ssize_t i;
+	size_t w;
+	char h;
+	char l;
+
+	pbytes.p = p;
+	b[0] = '0';
+	b[1] = 'x';
+
+	for (i = plen - 1, w = 2; i >= 0; i--)
+	{
+		h = charset[pbytes.b[i] >> 4 & 0xf];
+		l = charset[pbytes.b[i] & 0xf];
+
+		if (h == '0' && l == '0' && w == 2) continue;
+
+		if (w != 2 || h != '0') b[w++] = h;
+		b[w++] = l;
+	}
+	b[w] = '\0';
 }
 
 static int
@@ -117,6 +157,11 @@ format_to_buffer(char *b, const char *format, va_list ap)
 				tok_list[tok_c].data.u = va_arg(ap, unsigned int);
 				start = ch + 2;
 				break;
+			case 'p':
+				tok_list[tok_c].type = POINTER;
+				tok_list[tok_c].data.p = va_arg(ap, void *);
+				start = ch + 2;
+				break;
 			case 's':
 				tok_list[tok_c].type = STRING;
 				tok_list[tok_c].data.s = va_arg(ap, char *);
@@ -173,6 +218,13 @@ format_to_buffer(char *b, const char *format, va_list ap)
 				break;
 			case ULONG:
 				sigultoa(ltoa_buff, tok_list[i].data.ul);
+				if (c + sigstrlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
+
+				(void)sigmemcpy(b + c, ltoa_buff, sigstrlen(ltoa_buff));
+				c += sigstrlen(ltoa_buff);
+				break;
+			case POINTER:
+				sigptoa(ltoa_buff, tok_list[i].data.p);
 				if (c + sigstrlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
 
 				(void)sigmemcpy(b + c, ltoa_buff, sigstrlen(ltoa_buff));

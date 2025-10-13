@@ -27,11 +27,11 @@ The `sigvdprintf`, `sigdprintf`, and `sigprintf` functions accept a limited subs
 | Format specifier | Description                              |
 |------------------|------------------------------------------|
 | %s               | Print a string                           |
+| %p               | Print a pointer                          |
 | %d               | Print a signed integer                   |
 | %ld              | Print a signed long integer              |
 | %u               | Print an unsigned integer                |
 | %lu              | Print an unsigned long integer           |
-| %x               | Print an unsigned integer in hexadecimal |
 | %%               | Print a literal '%'                      |
 
 ## Building
