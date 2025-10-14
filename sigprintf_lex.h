@@ -9,7 +9,10 @@ fmt_type
 	UINT,
 	LONG,
 	ULONG,
+	HEX,
+	UHEX,
 	POINTER,
+	CHAR,
 	STRING,
 	PERCENT
 };
@@ -30,6 +33,7 @@ fmt_tok
 		long l;
 		unsigned long ul;
 		void *p;
+		char c;
 		char *s;
 
 	} data;

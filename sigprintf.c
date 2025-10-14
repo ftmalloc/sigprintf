@@ -120,6 +120,32 @@ sigptoa(char *b, void *p)
 	b[w] = '\0';
 }
 
+static void
+sightoa(char *b, unsigned long p)
+{
+	const char charset[] = {
+		'0', '1', '2', '3',
+		'4', '5', '6', '7',
+		'8', '9', 'a', 'b',
+		'c', 'd', 'e', 'f'
+	};
+	ssize_t i;
+	size_t w;
+	char c;
+
+	b[0] = '0';
+	b[1] = 'x';
+
+	for (i = sizeof(unsigned long) * 8 - 4, w = 2; i >= 0; i -= 4)
+	{
+		c = charset[p >> i & 0xf];
+
+		if (c == '0' && w == 2) continue;
+		b[w++] = c;
+	}
+	b[w] = '\0';
+}
+
 static int
 format_to_buffer(char *b, const char *format, va_list ap)
 {
@@ -166,6 +192,11 @@ format_to_buffer(char *b, const char *format, va_list ap)
 					tok_list[tok_c].type = LONG;
 					tok_list[tok_c].data.ul = va_arg(ap, long);
 				}
+				else if (*(ch + 2) == 'x')
+				{
+					tok_list[tok_c].type = UHEX;
+					tok_list[tok_c].data.ul = va_arg(ap, unsigned long);
+				}
 				else
 				{
 					return -1;
@@ -177,9 +208,19 @@ format_to_buffer(char *b, const char *format, va_list ap)
 				tok_list[tok_c].data.u = va_arg(ap, unsigned int);
 				start = ch + 2;
 				break;
+			case 'x':
+				tok_list[tok_c].type = HEX;
+				tok_list[tok_c].data.u = va_arg(ap, unsigned int);
+				start = ch + 2;
+				break;
 			case 'p':
 				tok_list[tok_c].type = POINTER;
 				tok_list[tok_c].data.p = va_arg(ap, void *);
+				start = ch + 2;
+				break;
+			case 'c':
+				tok_list[tok_c].type = CHAR;
+				tok_list[tok_c].data.c = va_arg(ap, int);
 				start = ch + 2;
 				break;
 			case 's':
@@ -243,12 +284,31 @@ format_to_buffer(char *b, const char *format, va_list ap)
 				(void)sigmemcpy(b + c, ltoa_buff, sigstrlen(ltoa_buff));
 				c += sigstrlen(ltoa_buff);
 				break;
+			case HEX:
+				sightoa(ltoa_buff, tok_list[i].data.u);
+				if (c + sigstrlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
+
+				(void)sigmemcpy(b + c, ltoa_buff, sigstrlen(ltoa_buff));
+				c += sigstrlen(ltoa_buff);
+				break;
+			case UHEX:
+				sightoa(ltoa_buff, tok_list[i].data.ul);
+				if (c + sigstrlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
+
+				(void)sigmemcpy(b + c, ltoa_buff, sigstrlen(ltoa_buff));
+				c += sigstrlen(ltoa_buff);
+				break;
 			case POINTER:
 				sigptoa(ltoa_buff, tok_list[i].data.p);
 				if (c + sigstrlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
 
 				(void)sigmemcpy(b + c, ltoa_buff, sigstrlen(ltoa_buff));
 				c += sigstrlen(ltoa_buff);
+				break;
+			case CHAR:
+				if (c + 1 >= SIGPRINTF_FORMAT_LEN) return -1;
+
+				b[c++] = tok_list[i].data.c;
 				break;
 			case STRING:
 				if (c + sigstrlen(tok_list[i].data.s) >= SIGPRINTF_FORMAT_LEN) return -1;
