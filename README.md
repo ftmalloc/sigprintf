@@ -24,15 +24,20 @@ sigdputs(s, STDERR_FILENO);
 
 The `sigvdprintf`, `sigdprintf`, and `sigprintf` functions accept a limited subset of format specifiers as described in the table below:
 
-| Format specifier | Description                              |
-|------------------|------------------------------------------|
-| %s               | Print a string                           |
-| %p               | Print a pointer                          |
-| %d               | Print a signed integer                   |
-| %ld              | Print a signed long integer              |
-| %u               | Print an unsigned integer                |
-| %lu              | Print an unsigned long integer           |
-| %%               | Print a literal '%'                      |
+| Format specifier | Description                                     |
+|------------------|-------------------------------------------------|
+| %d               | Print a signed integer                          |
+| %u               | Print an unsigned integer                       |
+| %ld              | Print a signed long integer                     |
+| %lu              | Print an unsigned long integer                  |
+| %x               | Print an unsigned integer in hexadecimal        |
+| %lx              | Print an unsigned long integer in hexadecimal   |
+| %p               | Print a pointer                                 |
+| %c               | Print a character                               |
+| %s               | Print a string                                  |
+| %%               | Print a literal '%'                             |
+
+NOTE: These specifiers do not support width, precision, or length modifiers.
 
 ## Building
 
