@@ -10,7 +10,7 @@ fmt_type
 	LONG,
 	ULONG,
 	HEX,
-	UHEX,
+	LHEX,
 	POINTER,
 	CHAR,
 	STRING,

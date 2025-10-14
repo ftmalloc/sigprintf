@@ -3,148 +3,11 @@
 #include <unistd.h>
 
 #include "sigprintf.h"
+#include "sigprintf_conv.h"
 #include "sigprintf_lex.h"
 #include "sigstring.h"
 
-#define LTOA_BUFF_LEN 21 /* Max digits of an unsigned 64-bit integer */
 #define SIGPRINTF_MAX_TOKENS 24
-
-union
-ptr_bytes
-{
-	void *p;
-	unsigned char b[sizeof(void *)];
-};
-
-static void
-sigultoa(char *b, unsigned long u)
-{
-	int d = 0;
-	int i;
-	size_t b_len;
-	char temp;
-
-	(void)sigmemset(b, 0, LTOA_BUFF_LEN);
-	if (u == 0)
-	{
-		b[0] = '0';
-
-		return;
-	}
-	while (u > 0)
-	{
-		b[d++] = (char)(u % 10 + '0');
-		u /= 10;
-	}
-	b_len = sigstrlen(b);
-	for (i = 0; i < b_len >> 1; i++)
-	{
-		temp = b[i];
-		b[i] = b[b_len - 1 - i];
-		b[b_len - 1 - i] = temp;
-	}
-}
-
-static void
-sigltoa(char *b, long d)
-{
-	long dabs;
-	int neg;
-	int min = 0;
-	size_t i;
-
-	if (d < 0)
-	{
-		if (d == LONG_MIN)
-		{
-			dabs = LONG_MAX;
-			min = 1;
-		}
-		else
-		{
-			dabs = -d;
-		}
-		neg = 1;
-	}
-	else
-	{
-		dabs = d;
-		neg = 0;
-	}
-	sigultoa(b, dabs);
-	if (neg)
-	{
-		(void)sigmemmove(&b[1], b, sigstrlen(b) + 1);
-		b[0] = '-';
-		if (min)
-			for (i = sigstrlen(b) - 1; i > 0; i--)
-			{
-				if (++b[i] == '9' + 1)
-					b[i] = '0';
-				else
-					break;
-			}
-	}
-}
-
-static void
-sigptoa(char *b, void *p)
-{
-	const char charset[] = {
-		'0', '1', '2', '3',
-		'4', '5', '6', '7',
-		'8', '9', 'a', 'b',
-		'c', 'd', 'e', 'f'
-	};
-	union ptr_bytes pbytes;
-	ssize_t plen = sizeof(void *);
-	ssize_t i;
-	size_t w;
-	char h;
-	char l;
-
-	pbytes.p = p;
-	b[0] = '0';
-	b[1] = 'x';
-
-	for (i = plen - 1, w = 2; i >= 0; i--)
-	{
-		h = charset[pbytes.b[i] >> 4 & 0xf];
-		l = charset[pbytes.b[i] & 0xf];
-
-		if (h == '0' && l == '0' && w == 2) continue;
-
-		if (w != 2 || h != '0') b[w++] = h;
-		b[w++] = l;
-	}
-	b[w] = '\0';
-}
-
-static void
-sightoa(char *b, unsigned long p)
-{
-	const char charset[] = {
-		'0', '1', '2', '3',
-		'4', '5', '6', '7',
-		'8', '9', 'a', 'b',
-		'c', 'd', 'e', 'f'
-	};
-	ssize_t i;
-	size_t w;
-	char c;
-
-	b[0] = '0';
-	b[1] = 'x';
-
-	for (i = sizeof(unsigned long) * 8 - 4, w = 2; i >= 0; i -= 4)
-	{
-		c = charset[p >> i & 0xf];
-
-		if (c == '0' && w == 2) continue;
-		b[w++] = c;
-	}
-	b[w] = '\0';
-}
 
 static int
 format_to_buffer(char *b, const char *format, va_list ap)
@@ -194,7 +57,7 @@ format_to_buffer(char *b, const char *format, va_list ap)
 				}
 				else if (*(ch + 2) == 'x')
 				{
-					tok_list[tok_c].type = UHEX;
+					tok_list[tok_c].type = LHEX;
 					tok_list[tok_c].data.ul = va_arg(ap, unsigned long);
 				}
 				else
@@ -291,7 +154,7 @@ format_to_buffer(char *b, const char *format, va_list ap)
 				(void)sigmemcpy(b + c, ltoa_buff, sigstrlen(ltoa_buff));
 				c += sigstrlen(ltoa_buff);
 				break;
-			case UHEX:
+			case LHEX:
 				sightoa(ltoa_buff, tok_list[i].data.ul);
 				if (c + sigstrlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
 
