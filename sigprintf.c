@@ -45,24 +45,22 @@ format_to_buffer(char *b, const char *format, va_list ap)
 				start = ch + 2;
 				break;
 			case 'l':
-				if (*(ch + 2) == 'u')
+				switch (*(ch + 2))
 				{
-					tok_list[tok_c].type = ULONG;
-					tok_list[tok_c].data.l = va_arg(ap, unsigned long);
-				}
-				else if (*(ch + 2) == 'd')
-				{
-					tok_list[tok_c].type = LONG;
-					tok_list[tok_c].data.ul = va_arg(ap, long);
-				}
-				else if (*(ch + 2) == 'x')
-				{
-					tok_list[tok_c].type = LHEX;
-					tok_list[tok_c].data.ul = va_arg(ap, unsigned long);
-				}
-				else
-				{
-					return -1;
+					case 'd':
+						tok_list[tok_c].type = LONG;
+						tok_list[tok_c].data.l = va_arg(ap, long);
+						break;
+					case 'u':
+						tok_list[tok_c].type = ULONG;
+						tok_list[tok_c].data.ul = va_arg(ap, unsigned long);
+						break;
+					case 'x':
+						tok_list[tok_c].type = LHEX;
+						tok_list[tok_c].data.ul = va_arg(ap, unsigned long);
+						break;
+					default:
+						return -1;
 				}
 				start = ch + 3;
 				break;
