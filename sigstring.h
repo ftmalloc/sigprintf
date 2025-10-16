@@ -4,6 +4,7 @@
 #include <stddef.h>
 
 size_t sigstrlen(const char *s);
+char *sigstrcpy(char *dst, const char *src);
 char *sigstrncpy(char *dst, const char *src, size_t len);
 char *sigstrchr(const char *s, int c);
 void *sigmemset(void *s, int c, size_t n);

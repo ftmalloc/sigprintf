@@ -3,12 +3,24 @@
 size_t
 sigstrlen(const char *s)
 {
-	size_t i;
+	size_t i = 0;
 
-	for (i = 0; s[i] != '\0'; i++)
-		;
+	while (s[i] != '\0') i++;
 
 	return i;
+}
+
+char *
+sigstrcpy(char *dst, const char *src)
+{
+	size_t i = 0;
+
+	do
+	{
+		dst[i] = src[i];
+	} while (src[i++] != '\0');
+
+	return dst;
 }
 
 char *
