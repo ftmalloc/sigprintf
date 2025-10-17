@@ -5,6 +5,17 @@
 #include "sigstring.h"
 #include "sigprintf_conv.h"
 
+#define SIGPRINTF_LITTLE_ENDIAN 1
+
+static int
+endian_test(void)
+{
+	int i = 1;
+	char *c = (char *)&i;
+
+	return *c;
+}
+
 void
 sigultoa(char *b, unsigned long ul)
 {
@@ -96,16 +107,32 @@ sigptoa(char *b, void *p)
 	b[0] = '0';
 	b[1] = 'x';
 
-	for (i = plen - 1, w = 2; i >= 0; i--)
+	if (endian_test() == SIGPRINTF_LITTLE_ENDIAN)
 	{
-		h = charset[pbytes.b[i] >> 4 & 0xf];
-		l = charset[pbytes.b[i] & 0xf];
+		for (i = plen - 1, w = 2; i >= 0; i--)
+		{
+			h = charset[pbytes.b[i] >> 4 & 0xf];
+			l = charset[pbytes.b[i] & 0xf];
 
-		if (h == '0' && l == '0' && w == 2) continue;
+			if (h == '0' && l == '0' && w == 2) continue;
 
-		if (w != 2 || h != '0') b[w++] = h;
-		b[w++] = l;
+			if (w != 2 || h != '0') b[w++] = h;
+			b[w++] = l;
+		}
 	}
+	else /* Big Endian */
+	{
+		for (i = 0, w = 2; i < plen; i++)
+		{
+			h = charset[pbytes.b[i] >> 4 & 0xf];
+			l = charset[pbytes.b[i] & 0xf];
+
+			if (h == '0' && l == '0' && w == 2) continue;
+
+			if (w != 2 || h != '0') b[w++] = h;
+		}
+	}
+	if (w == 2) b[w++] = '0';
 	b[w] = '\0';
 }
 

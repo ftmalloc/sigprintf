@@ -11,6 +11,7 @@ main(void)
 	(void)sigdputs("Hello, error world!\n", STDERR_FILENO);
 	(void)sigprintf("%s %s %s\n", "Hello", "printf", "world");
 	(void)sigprintf("Main function location: %p\n", (void *)main);
+	(void)sigprintf("Here's a NULL pointer: %p\n", NULL);
 	(void)sigprintf("The value of LONG_MIN on this system is: %ld\n", LONG_MIN);
 	(void)sigprintf("The value of INT_MIN on this system is: %d\n", INT_MIN);
 	(void)sigprintf("The value of ULONG_MAX on this system is: %lu\n", ULONG_MAX);
