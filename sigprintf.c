@@ -15,7 +15,7 @@ format_to_buffer(char *b, const char *format, va_list ap)
 	struct fmt_tok tok_list[SIGPRINTF_MAX_TOKENS];
 	int tok_c = 0;
 	int i;
-	char *start = (char *)format;
+	const char *start = format;
 	char *ch;
 	char f;
 	long end;

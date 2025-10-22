@@ -25,7 +25,7 @@ fmt_tok
 	{
 		struct
 		{
-			char *str;
+			const char *str;
 			size_t len;
 		} lit;
 		int d;
@@ -34,7 +34,7 @@ fmt_tok
 		unsigned long ul;
 		void *p;
 		char c;
-		char *s;
+		const char *s;
 
 	} data;
 };
