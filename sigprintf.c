@@ -202,14 +202,20 @@ sigdputs(const char *s, int fd)
 int
 sigputs(const char *s)
 {
+	char b[SIGPRINTF_FORMAT_LEN];
 	int c;
+	size_t len;
 
-	c = sigdputs(s, STDOUT_FILENO);
+	len = sigstrlen(s);
+	if (len >= SIGPRINTF_FORMAT_LEN) return -1;
+
+	(void)sigmemcpy(b, s, len);
+	b[len++] = '\n';
+	b[len] = '\0';
+	c = sigdputs(b, STDOUT_FILENO);
 	if (c == -1) return -1;
 
-	if (write(1, "\n", 1) == -1) return c;
-
-	return c + 1;
+	return c;
 }
 
 int
