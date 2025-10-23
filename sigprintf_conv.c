@@ -21,10 +21,8 @@ sigultoa(char *b, unsigned long ul)
 {
 	int d = 0;
 	int i;
-	size_t b_len;
 	char temp;
 
-	(void)sigmemset(b, 0, LTOA_BUFF_LEN);
 	if (ul == 0)
 	{
 		b[0] = '0';
@@ -36,13 +34,13 @@ sigultoa(char *b, unsigned long ul)
 		b[d++] = (char)(ul % 10 + '0');
 		ul /= 10;
 	}
-	b_len = sigstrlen(b);
-	for (i = 0; i < b_len >> 1; i++)
+	for (i = 0; i < d >> 1; i++)
 	{
 		temp = b[i];
-		b[i] = b[b_len - 1 - i];
-		b[b_len - 1 - i] = temp;
+		b[i] = b[d - 1 - i];
+		b[d - 1 - i] = temp;
 	}
+	b[d] = '\0';
 }
 
 void
