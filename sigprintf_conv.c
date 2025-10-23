@@ -5,10 +5,8 @@
 #include "sigstring.h"
 #include "sigprintf_conv.h"
 
-#define SIGPRINTF_LITTLE_ENDIAN 1
-
 static int
-endian_test(void)
+is_little_endian(void)
 {
 	int i = 1;
 	char *c = (char *)&i;
@@ -106,7 +104,7 @@ sigptoa(char *b, void *p)
 	b[0] = '0';
 	b[1] = 'x';
 
-	if (endian_test() == SIGPRINTF_LITTLE_ENDIAN)
+	if (is_little_endian() == 1)
 	{
 		for (i = plen - 1, w = 2; i >= 0; i--)
 		{
