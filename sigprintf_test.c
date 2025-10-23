@@ -16,6 +16,8 @@ main(void)
 	(void)sigprintf("The value of INT_MIN on this system is: %d\n", INT_MIN);
 	(void)sigprintf("The value of ULONG_MAX on this system is: %lu\n", ULONG_MAX);
 	(void)sigprintf("A normal negative number should print as such: %d\n", -42);
+	(void)sigprintf("Here's a number with an odd number of digits: %d\n", 12345);
+	(void)sigprintf("Here's a number with an even number of digits: %d\n", 123456);
 	(void)sigprintf("Here's a hex humber: %x\n", 42);
 	(void)sigprintf("Here's a long hex number: %lx\n", 42L);
 	(void)sigprintf("Here's a single character: %c\n", 'h');
