@@ -26,6 +26,7 @@ sigultoa(char *b, unsigned long ul)
 	if (ul == 0)
 	{
 		b[0] = '0';
+		b[1] = '\0';
 
 		return;
 	}
@@ -128,6 +129,7 @@ sigptoa(char *b, void *p)
 			if (h == '0' && l == '0' && w == 2) continue;
 
 			if (w != 2 || h != '0') b[w++] = h;
+			b[w++] = l;
 		}
 	}
 	if (w == 2) b[w++] = '0';
@@ -149,6 +151,13 @@ sightoa(char *b, unsigned long ul)
 
 	b[0] = '0';
 	b[1] = 'x';
+	if (ul == 0)
+	{
+		b[2] = '0';
+		b[3] = '\0';
+
+		return;
+	}
 
 	for (i = sizeof(unsigned long) * 8 - 4, w = 2; i >= 0; i -= 4)
 	{
