@@ -1,7 +1,7 @@
 #ifndef SIGPRINTF_SIGPRINTF_CONV_H
 #define SIGPRINTF_SIGPRINTF_CONV_H
 
-#define LTOA_BUFF_LEN 21 /* Max digits of an unsigned 64-bit integer */
+#define SPECIFIER_BUFF_LEN 21 /* Max digits of an unsigned 64-bit integer */
 
 union
 ptr_bytes

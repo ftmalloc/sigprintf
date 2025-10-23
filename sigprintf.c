@@ -10,6 +10,19 @@
 #define SIGPRINTF_MAX_TOKENS 24
 
 static int
+copy_string_to_buffer(char *b, const char *s, size_t *c)
+{
+	size_t len = sigstrlen(s);
+
+	if (*c + len >= SIGPRINTF_FORMAT_LEN) return -1;
+
+	(void)sigmemcpy(b, s, len);
+	*c += len;
+
+	return 0;
+}
+
+static int
 format_to_buffer(char *b, const char *format, va_list ap)
 {
 	struct fmt_tok tok_list[SIGPRINTF_MAX_TOKENS];
@@ -19,7 +32,7 @@ format_to_buffer(char *b, const char *format, va_list ap)
 	char *ch;
 	char f;
 	long end;
-	char ltoa_buff[LTOA_BUFF_LEN];
+	char specifier_buff[SPECIFIER_BUFF_LEN];
 	size_t fmt_len = sigstrlen(format);
 	size_t c = 0;
 
@@ -118,53 +131,39 @@ format_to_buffer(char *b, const char *format, va_list ap)
 				c += tok_list[i].data.lit.len;
 				break;
 			case INT:
-				sigltoa(ltoa_buff, tok_list[i].data.d);
-				if (c + sigstrlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
+				sigltoa(specifier_buff, tok_list[i].data.d);
+				if (copy_string_to_buffer(b + c, specifier_buff, &c) == -1) return -1;
 
-				(void)sigmemcpy(b + c, ltoa_buff, sigstrlen(ltoa_buff));
-				c += sigstrlen(ltoa_buff);
 				break;
 			case LONG:
-				sigltoa(ltoa_buff, tok_list[i].data.l);
-				if (c + sigstrlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
+				sigltoa(specifier_buff, tok_list[i].data.l);
+				if (copy_string_to_buffer(b + c, specifier_buff, &c) == -1) return -1;
 
-				(void)sigmemcpy(b + c, ltoa_buff, sigstrlen(ltoa_buff));
-				c += sigstrlen(ltoa_buff);
 				break;
 			case UINT:
-				sigultoa(ltoa_buff, tok_list[i].data.u);
-				if (c + sigstrlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
+				sigultoa(specifier_buff, tok_list[i].data.u);
+				if (copy_string_to_buffer(b + c, specifier_buff, &c) == -1) return -1;
 
-				(void)sigmemcpy(b + c, ltoa_buff, sigstrlen(ltoa_buff));
-				c += sigstrlen(ltoa_buff);
 				break;
 			case ULONG:
-				sigultoa(ltoa_buff, tok_list[i].data.ul);
-				if (c + sigstrlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
+				sigultoa(specifier_buff, tok_list[i].data.ul);
+				if (copy_string_to_buffer(b + c, specifier_buff, &c) == -1) return -1;
 
-				(void)sigmemcpy(b + c, ltoa_buff, sigstrlen(ltoa_buff));
-				c += sigstrlen(ltoa_buff);
 				break;
 			case HEX:
-				sightoa(ltoa_buff, tok_list[i].data.u);
-				if (c + sigstrlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
+				sightoa(specifier_buff, tok_list[i].data.u);
+				if (copy_string_to_buffer(b + c, specifier_buff, &c) == -1) return -1;
 
-				(void)sigmemcpy(b + c, ltoa_buff, sigstrlen(ltoa_buff));
-				c += sigstrlen(ltoa_buff);
 				break;
 			case LHEX:
-				sightoa(ltoa_buff, tok_list[i].data.ul);
-				if (c + sigstrlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
+				sightoa(specifier_buff, tok_list[i].data.ul);
+				if (copy_string_to_buffer(b + c, specifier_buff, &c) == -1) return -1;
 
-				(void)sigmemcpy(b + c, ltoa_buff, sigstrlen(ltoa_buff));
-				c += sigstrlen(ltoa_buff);
 				break;
 			case POINTER:
-				sigptoa(ltoa_buff, tok_list[i].data.p);
-				if (c + sigstrlen(ltoa_buff) >= SIGPRINTF_FORMAT_LEN) return -1;
+				sigptoa(specifier_buff, tok_list[i].data.p);
+				if (copy_string_to_buffer(b + c, specifier_buff, &c) == -1) return -1;
 
-				(void)sigmemcpy(b + c, ltoa_buff, sigstrlen(ltoa_buff));
-				c += sigstrlen(ltoa_buff);
 				break;
 			case CHAR:
 				if (c + 1 >= SIGPRINTF_FORMAT_LEN) return -1;
@@ -172,10 +171,8 @@ format_to_buffer(char *b, const char *format, va_list ap)
 				b[c++] = tok_list[i].data.c;
 				break;
 			case STRING:
-				if (c + sigstrlen(tok_list[i].data.s) >= SIGPRINTF_FORMAT_LEN) return -1;
+				if (copy_string_to_buffer(b + c, tok_list[i].data.s, &c) == -1) return -1;
 
-				(void)sigmemcpy(b + c, tok_list[i].data.s, sigstrlen(tok_list[i].data.s));
-				c += sigstrlen(tok_list[i].data.s);
 				break;
 			case PERCENT:
 				if (c + 1 >= SIGPRINTF_FORMAT_LEN) return -1;
