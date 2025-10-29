@@ -1,6 +1,12 @@
 #ifndef SIGPRINTF_SIGPRINTF_LEX_H
 #define SIGPRINTF_SIGPRINTF_LEX_H
 
+#ifdef UNIT_TEST
+	#define LOCAL
+#else
+	#define LOCAL static
+#endif
+
 enum
 fmt_type
 {
