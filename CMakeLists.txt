@@ -7,5 +7,11 @@ add_library(sigprintf STATIC sigprintf.c
 	sigstring.c
 	sigprintf_conv.c)
 
-add_executable(sigprintf_test sigprintf_test.c)
-target_link_libraries(sigprintf_test sigprintf)
+add_library(sigprintf_test SHARED sigprintf.c
+	sigstring.c
+	sigprintf_conv.c)
+
+add_executable(sigprintf_driver sigprintf_driver.c)
+target_link_libraries(sigprintf_driver sigprintf)
+
+target_compile_options(sigprintf_test PRIVATE -DUNIT_TEST -fPIC)

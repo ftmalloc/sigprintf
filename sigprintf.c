@@ -4,12 +4,12 @@
 
 #include "sigprintf.h"
 #include "sigprintf_conv.h"
-#include "sigprintf_lex.h"
+#include "sigprintf_internal.h"
 #include "sigstring.h"
 
 #define SIGPRINTF_MAX_TOKENS 24
 
-static int
+LOCAL int
 copy_string_to_buffer(char *b, const char *s, size_t *c)
 {
 	size_t len = sigstrlen(s);
@@ -22,7 +22,7 @@ copy_string_to_buffer(char *b, const char *s, size_t *c)
 	return 0;
 }
 
-static int
+LOCAL int
 format_to_buffer(char *b, const char *format, va_list ap)
 {
 	struct fmt_tok tok_list[SIGPRINTF_MAX_TOKENS];

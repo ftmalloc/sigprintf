@@ -4,8 +4,9 @@
 
 #include "sigstring.h"
 #include "sigprintf_conv.h"
+#include "sigprintf_internal.h"
 
-static int
+LOCAL int
 is_little_endian(void)
 {
 	int i = 1;
