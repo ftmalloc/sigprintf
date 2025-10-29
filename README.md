@@ -43,3 +43,15 @@ NOTE: These specifiers do not support width, precision, or length modifiers.
 
 The included CMakeLists.txt file can be used to build sigprintf, typically as a static library for use in other projects.
 The implementation is simple enough however that it should be easy to integrate into other build systems.
+
+## Tests
+
+The test suite uses RSpec, and so depends on Ruby and RSpec.
+Assuming Ruby is installed on your system, RSpec can be installed with the following command:
+```Bash
+gem install rspec
+```
+
+With RSpec installed and added to PATH, and after making sure that the `sigprintf_test` target has been built, the test suite can be run by running `rspec` in the root of the project.
+
+There is also a small driver application included, `sigprintf_driver`, which runs through some of the printing and formatting options that would be more difficult to unit test.
